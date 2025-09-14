@@ -1,0 +1,89 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+.env/
+.venv/
+env/
+venv/
+ENV/
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+local/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# mypy
+.mypy_cache/
+
+# Pyre
+.pyre/
+
+# VSCode settings
+.vscode/
+
+# Local temp and cache folders
+tmp/
+temporal/
+temp/
+logs/
+*.log
+
+# Dapr default component folder (ignore local state/object store definitions)
+components/
+.dapr/
+dapr-components/
+
+# Docker
+*.log
+*.pid
+*.seed
+*.bak
+*.tmp
+docker-compose.override.yml
+
+# System files
+.DS_Store
+Thumbs.db
