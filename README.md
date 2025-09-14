@@ -1,73 +1,116 @@
-# 👋 Hello World
+# SourceSense
 
-A simple starter application demonstrating how to build apps with Application SDK.
+SourceSense is a metadata extraction application built on the [Atlan Apps Framework](https://github.com/atlanhq/application-sdk).  
+It connects to a PostgreSQL database, extracts schema-level metadata, and exports it in a structured JSON format.  
+The project demonstrates how to transform raw database structures into meaningful metadata that can be used for data discovery, governance, and lineage.
 
-![Screenshot](https://github.com/user-attachments/assets/416be4d4-e137-42c4-9537-869df2c8f87e)
+---
 
-## Prerequisites
+## Features
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/) package manager
-- [Dapr CLI](https://docs.dapr.io/getting-started/install-dapr-cli/)
-- [Temporal CLI](https://docs.temporal.io/cli)
+- *PostgreSQL Integration*  
+  Connects securely to PostgreSQL databases using standard credentials.
+
+- *Metadata Extraction*  
+  - Databases, schemas, tables, and columns  
+  - Data types and constraints (primary keys, foreign keys, not nulls)  
+  - Business context from PostgreSQL COMMENT metadata  
+  - Optional lineage from foreign key relationships  
+  - Optional data quality metrics such as null counts and distinct values
+
+- *Metadata Export*  
+  Extracted metadata is consolidated and written to a single JSON file for reuse or integration.
+
+- *Extensible Design*  
+  The architecture is modular, with reusable SQL activities and workflow handlers, enabling extension to other SQL-based sources.
+
+---
+
+## Architecture
+
+The application follows a layered design:
+
+1. *Connector Layer*  
+   - A custom SQLClient extends BaseSQLClient.  
+   - Defines the PostgreSQL connection template (postgresql+psycopg://...).  
+   - Supports credentials such as host, port, user, password, and database.
+
+2. *Metadata Processing Layer*  
+   - SampleSQLActivities contains queries for extracting metadata from PostgreSQL system catalogs (information_schema and pg_catalog).  
+   - Supports include/exclude filters and regex patterns for excluding temporary tables.  
+
+3. *Workflow Layer*  
+   - SampleSQLWorkflowHandler manages orchestration of extraction.  
+   - Built on BaseSQLMetadataExtractionWorkflow from the Atlan SDK.  
+   - Configurable with connection details, include/exclude filters, and regex-based rules.
+
+4. *Export Layer*  
+   - save_metadata_to_json() collects workflow outputs for asset types (databases, schemas, tables, columns).  
+   - Merges them into a single JSON file saved in the root directory.  
+   - File naming convention:  
+     
+     extracted_metadata_<workflow_id>_<timestamp>.json
+     
+
+5. *Orchestration and Execution*  
+   - run_sql_application() initializes the Temporal workflow client.  
+   - Starts the worker, registers activities, and launches workflows.  
+   - Supports both daemon (background) and foreground execution modes.  
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+- Python 3.11 or later  
+- PostgreSQL instance (local or remote)  
+- Atlan App SDK installed
+- Temporal and Dapr setup 
 
 ### Installation Guides
 - [macOS Setup Guide](https://github.com/atlanhq/application-sdk/blob/main/docs/docs/setup/MAC.md)
 - [Linux Setup Guide](https://github.com/atlanhq/application-sdk/blob/main/docs/docs/setup/LINUX.md)
 - [Windows Setup Guide](https://github.com/atlanhq/application-sdk/blob/main/docs/docs/setup/WINDOWS.md)
 
-## Quick Start
 
-1. **Download required components:**
-   ```bash
-   uv run poe download-components
-   ```
+### Installation
+Clone the repository and install dependencies:
 
-2. **Start dependencies (in separate terminal):**
-   ```bash
-   uv run poe start-deps
-   ```
+```bash
+git clone https://github.com/Rahul-Phoolbhati/SourceSence/tree/main
+cd SourceSense
 
-3. **Run the application:**
-   ```bash
-   uv run main.py
-   ```
+# Install UV
+curl -LsSf https://astral.sh/uv/0.7.3/install.sh | sh
+
+# Install Python 3.11.10
+uv venv --python 3.11.10
+
+# activate the venv
+source .venv/bin/activate
+
+# Python dependencies
+uv run poe download-components
+
+# Run the Workflow for extraction of metadata
+uv run myapp.py
+
+# Save the Extraceted data into single json file (from Dapr object store)
+uv run save_metadata.py
+```
+
 
 **Access the application:**
-- **Web Interface**: http://localhost:8000
 - **Temporal UI**: http://localhost:8233
 
-## Features
-- Simple web interface to input your name
-- Real-time workflow status tracking
-- Integration with Temporal for workflow management
-- Demonstrates async and sync activities in workflows
 
-## Development
-
-### Stop Dependencies
-```bash
-uv run poe stop-deps
-```
-
-### Run Tests
-```bash
-uv run pytest
-```
 
 ### Project Structure
 ```
-hello_world/
-├── app/                # Core application logic
-│   ├── activities.py   # Workflow activities
-│   └── workflow.py     # Workflow definitions
-├── frontend/           # Frontend assets
-│   ├── static/        # Static files (CSS, JS)
-│   └── templates/     # HTML templates
+SourceSence/
+├── experiments/        # Experimental work
 ├── local/              # Local data storage
-├── deploy/            # Installation and deployment files
-├── tests/              # Test files
-├── main.py            # Application entry point
+├── myapp.py            # Application entry point
 ├── pyproject.toml     # Dependencies and config
 └── README.md          # This file
 ```

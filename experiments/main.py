@@ -27,7 +27,7 @@ async def main():
 
     # setup workflow
     await app.setup_workflow(
-        workflow_and_activities_classes=[(MyWorkflow, MyWorkflowActivities)],
+        workflow_and_activities_classes=[(HelloWorldWorkflow, HelloWorldActivities)],
     )
     
     # app.start_workflow(workflow_args={"metadata": "John Doe"})
@@ -36,7 +36,7 @@ async def main():
     await app.start_worker()
 
     # Setup the application server
-    await app.setup_server(workflow_class=MyWorkflow)
+    await app.setup_server(workflow_class=HelloWorldWorkflow)
     
 
     # start server
